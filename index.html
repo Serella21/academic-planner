@@ -1,0 +1,307 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Academic Planner</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f2;
+    color: #252c28;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    padding: 25px 8%;
+    border-bottom: 1px solid #deded7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #174d3b;
+}
+
+.logo span {
+    color: #e87540;
+}
+
+header a {
+    color: #174d3b;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+main {
+    width: 100%;
+    max-width: 850px;
+    margin: 75px auto;
+    padding: 0 25px;
+    flex: 1;
+}
+
+.tag {
+    color: #e87540;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.subtitle {
+    color: #555;
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.task-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 35px;
+}
+
+input {
+    flex: 1;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #d9d9d2;
+    border-radius: 5px;
+    font-size: 16px;
+    background: white;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.add-btn {
+    background: #174d3b;
+    color: white;
+    padding: 0 24px;
+}
+
+.add-btn:hover {
+    background: #103b2d;
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 5px;
+    border-bottom: 1px solid #deded7;
+}
+
+.task input[type="checkbox"] {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    accent-color: #174d3b;
+    cursor: pointer;
+}
+
+.task span {
+    flex: 1;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+}
+
+.task.completed span {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.delete-btn {
+    background: #f5e3dc;
+    color: #b83e25;
+    padding: 9px 13px;
+}
+
+.delete-btn:hover {
+    background: #f0d3c8;
+}
+
+.empty {
+    color: #888;
+    padding: 20px 0;
+}
+
+footer {
+    border-top: 1px solid #deded7;
+    padding: 25px 8%;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+    color: #777;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: 20px;
+    }
+
+    main {
+        margin: 50px auto;
+    }
+
+    h1 {
+        font-size: 29px;
+    }
+
+    .task-form {
+        flex-direction: column;
+    }
+
+    .add-btn {
+        padding: 15px;
+    }
+
+    footer {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">AS<span>.</span></div>
+    <a href="https://serella21.github.io/cos106-academic-portfolio/">
+        My Portfolio
+    </a>
+</header>
+
+<main>
+    <p class="tag">STAY ORGANISED / STAY FOCUSED</p>
+
+    <h1>My Academic Planner</h1>
+
+    <p class="subtitle">
+        Keep track of your learning activities, deadlines and assignments.
+    </p>
+
+    <form class="task-form" id="taskForm">
+        <input
+            type="text"
+            id="taskInput"
+            placeholder="Enter a new task..."
+            required
+        >
+        <button class="add-btn" type="submit">Add Task +</button>
+    </form>
+
+    <h2>My Tasks</h2>
+
+    <div id="taskList"></div>
+</main>
+
+<footer>
+    <span>© 2026 Ayomide Shoyombo</span>
+    <span>Academic Planner</span>
+</footer>
+
+<script>
+const taskForm = document.getElementById("taskForm");
+const taskInput = document.getElementById("taskInput");
+const taskList = document.getElementById("taskList");
+
+let tasks = JSON.parse(localStorage.getItem("academicTasks")) || [];
+
+function saveTasks() {
+    localStorage.setItem("academicTasks", JSON.stringify(tasks));
+}
+
+function renderTasks() {
+    taskList.innerHTML = "";
+
+    if (tasks.length === 0) {
+        taskList.innerHTML =
+            '<p class="empty">No tasks yet. Add your first task!</p>';
+        return;
+    }
+
+    tasks.forEach((task, index) => {
+        const row = document.createElement("div");
+        row.className = "task" + (task.completed ? " completed" : "");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.completed;
+
+        checkbox.addEventListener("change", () => {
+            tasks[index].completed = checkbox.checked;
+            saveTasks();
+            renderTasks();
+        });
+
+        const text = document.createElement("span");
+        text.textContent = task.name;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete-btn";
+        deleteButton.textContent = "Delete";
+
+        deleteButton.addEventListener("click", () => {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderTasks();
+        });
+
+        row.append(checkbox, text, deleteButton);
+        taskList.appendChild(row);
+    });
+}
+
+taskForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const name = taskInput.value.trim();
+
+    if (!name) return;
+
+    tasks.push({
+        name: name,
+        completed: false
+    });
+
+    saveTasks();
+    renderTasks();
+    taskInput.value = "";
+    taskInput.focus();
+});
+
+renderTasks();
+</script>
+
+</body>
+</html>
